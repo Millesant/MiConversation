@@ -1,8 +1,9 @@
 package me.millesant.conversation;
 
 import cn.nukkit.Player;
-import cn.nukkit.Server;
+
 import cn.nukkit.plugin.Plugin;
+
 import lombok.Getter;
 import lombok.Setter;
 
@@ -75,6 +76,7 @@ public class Conversation {
     }
 
     public Conversation addConversationCanceller(final ConversationCanceller canceller) {
+        canceller.setConversation(this);
         this.getCancellers().add(canceller);
         return this;
     }

@@ -1,9 +1,11 @@
 package me.millesant.conversation;
 
 import cn.nukkit.plugin.Plugin;
+
 import cn.nukkit.scheduler.TaskHandler;
 
 import lombok.Getter;
+import lombok.Setter;
 
 import java.util.Objects;
 
@@ -16,18 +18,30 @@ public class InactivityConversationCanceller implements ConversationCanceller {
 
     protected Conversation conversation;
 
+    @Setter
     protected TaskHandler taskHandler;
+
+    protected String timeoutMessage;
 
     public InactivityConversationCanceller(final Plugin plugin,
                                            final int timeoutSeconds) {
+        this(plugin, timeoutSeconds, String.format("Conversation timed out after %s seconds of inactivity.", timeoutSeconds));
+    }
+
+    public InactivityConversationCanceller(final Plugin plugin,
+                                           final int timeoutSeconds,
+                                           final String timeoutMessage) {
         this.plugin = plugin;
         this.timeoutSeconds = timeoutSeconds;
+        this.timeoutMessage = timeoutMessage;
     }
 
     @Override
     public void setConversation(final Conversation conversation) {
         this.conversation = conversation;
-        this.startTimer();
+
+        if (Objects.nonNull(conversation))
+            this.startTimer();
     }
 
     @Override
@@ -40,16 +54,26 @@ public class InactivityConversationCanceller implements ConversationCanceller {
 
     @Override
     public ConversationCanceller clone() {
-        return new InactivityConversationCanceller(plugin, timeoutSeconds);
+        return new InactivityConversationCanceller(plugin, timeoutSeconds, timeoutMessage);
     }
 
     public void startTimer() {
+        if (Objects.isNull(this.getConversation()) || this.getConversation().isAbandoned())
+            return;
+
+        this.stopTimer();
+
         this.taskHandler = this.getPlugin().getServer().getScheduler().scheduleDelayedTask(this.getPlugin(), () -> {
-            if (Objects.isNull(this.getConversation()))
+            if (Objects.isNull(this.getConversation()) || this.getConversation().isAbandoned())
                 return;
 
+            this.getConversation().getForWhom().sendMessage(
+                this.getConversation().getPrefix().getPrefix(this.getConversation().getConversationContext()) +
+                    this.getTimeoutMessage()
+            );
+
             this.getConversation().abandon(new ConversationAbandonedEvent(this.getConversation(), this));
-        }, timeoutSeconds * 20);
+        }, this.getTimeoutSeconds() * 20);
     }
 
     public void stopTimer() {
@@ -57,6 +81,7 @@ public class InactivityConversationCanceller implements ConversationCanceller {
             return;
 
         this.getTaskHandler().cancel();
+        this.setTaskHandler(null);
     }
 
 }

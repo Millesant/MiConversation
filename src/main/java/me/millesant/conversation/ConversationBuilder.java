@@ -73,6 +73,10 @@ public class ConversationBuilder {
         return this.addCanceller(new InactivityConversationCanceller(plugin, seconds));
     }
 
+    public ConversationBuilder timeout(final int seconds, final String timeoutMessage) {
+        return this.addCanceller(new InactivityConversationCanceller(plugin, seconds, timeoutMessage));
+    }
+
     public ConversationBuilder escapeSequence(final String escapeSequence) {
         return this.addCanceller(new ExactMatchConversationCanceller(escapeSequence));
     }

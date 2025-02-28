@@ -21,7 +21,7 @@ A lightweight conversation library for Nukkit plugins. As if you couldn't figure
     - `MessagePrompt` - Non-input messages, in case you need to be told something
 
 - **Conversation control** - I-it's not like I added these just for you:
-    - Timeout handling
+    - Timeout handling with automatic cancellation
     - Escape sequences (like "exit")
     - Custom exit messages
 
@@ -58,8 +58,29 @@ public class MyAwesomePrompt extends StringPrompt {
 ## Special Features
 
 - **Conversation timeout** - For when users are too slow to respond (ugh!)
+  - Automatically abandons conversations after a specified period of inactivity
+  - Resets timer when the user provides input
+  - Sends customizable timeout messages
 
 - **Modal conversations** - Blocks other chat input while active, because focusing on one thing is important, b-baka!
+
+## Cancelling Conversations
+
+Don't think I'm doing you a favor by explaining this! There are multiple ways to end a conversation:
+
+```java
+// Add a timeout (seconds)
+.timeout(30)
+
+// Add a timeout with custom message
+.timeout(30, "Time's up! I got tired of waiting for you!")
+
+// Add an escape sequence
+.escapeSequence("exit")
+
+// Add an escape sequence with custom message
+.escapeSequence("exit", "Finally! I was getting bored anyway!")
+```
 
 ## Installation
 

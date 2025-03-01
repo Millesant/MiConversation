@@ -1,0 +1,12 @@
+name: MiConversation
+
+version: 1.0-SNAPSHOT
+author: Millesant
+
+main: me.millesant.MiConversation
+
+api: [ 1.0.0 ]
+
+commands:
+  conversation:
+    description: Start a conversation with the server
